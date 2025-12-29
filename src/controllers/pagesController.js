@@ -44,10 +44,12 @@ const PagesController = {
 
     if (pageError && pageError.code !== "PGRST116") throw pageError;
 
-    // Get featured case studies - UPDATED with status instead of sector
+    // Get featured case studies - NOW INCLUDES TAGS
     const { data: caseStudies, error: csError } = await supabase
       .from("case_studies")
-      .select("id, title, slug, status, headline_summary, featured_image_url")
+      .select(
+        "id, title, slug, status, headline_summary, featured_image_url, tags"
+      )
       .eq("is_featured", true)
       .eq("is_published", true)
       .order("featured_order", { ascending: true })
@@ -142,10 +144,12 @@ const PagesController = {
 
     if (offeringsError) throw offeringsError;
 
-    // Get case studies for this service type - UPDATED with status instead of sector
+    // Get case studies for this service type - NOW INCLUDES TAGS
     const { data: caseStudies, error: csError } = await supabase
       .from("case_studies")
-      .select("id, title, slug, status, headline_summary, featured_image_url")
+      .select(
+        "id, title, slug, status, headline_summary, featured_image_url, tags"
+      )
       .eq("service_type", type)
       .eq("is_published", true)
       .order("published_at", { ascending: false })

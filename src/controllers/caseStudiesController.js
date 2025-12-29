@@ -9,7 +9,7 @@ const CaseStudiesController = {
     let query = supabase
       .from("case_studies")
       .select(
-        "id, title, slug, status, headline_summary, featured_image_url, published_at",
+        "id, title, slug, status, headline_summary, featured_image_url, published_at, tags",
         { count: "exact" }
       )
       .eq("is_published", true);
@@ -21,7 +21,7 @@ const CaseStudiesController = {
     // Search
     if (search) {
       query = query.or(
-        `title.ilike.%${search}%,status.ilike.%${search}%,headline_summary.ilike.%${search}%`
+        `title.ilike.%${search}%,status.ilike.%${search}%,headline_summary.ilike.%${search}%,tags.cs.%{${search}}%`
       );
     }
 
@@ -81,11 +81,11 @@ const CaseStudiesController = {
     });
   }),
 
-  // Get case study statuses (for filters) - UPDATED from sectors to status
+  // Get case study statuses (for filters)
   getStatuses: catchAsync(async (req, res) => {
     const { data, error } = await supabase
       .from("case_studies")
-      .select("status")
+      .select("status, tags")
       .eq("is_published", true)
       .order("status", { ascending: true });
 
@@ -96,9 +96,20 @@ const CaseStudiesController = {
       Boolean
     );
 
+    // Get all unique tags from the returned data
+    const allTags = data
+      .map((item) => item.tags || [])
+      .flat()
+      .filter((tag) => tag && tag.trim() !== "");
+
+    const uniqueTags = [...new Set(allTags)].sort();
+
     res.json({
       success: true,
-      data: statuses,
+      data: {
+        statuses,
+        tags: uniqueTags, // Include tags in the response
+      },
     });
   }),
 
@@ -108,7 +119,9 @@ const CaseStudiesController = {
 
     const { data, error } = await supabase
       .from("case_studies")
-      .select("id, title, slug, status, headline_summary, featured_image_url")
+      .select(
+        "id, title, slug, status, headline_summary, featured_image_url, tags"
+      )
       .eq("is_featured", true)
       .eq("is_published", true)
       .order("featured_order", { ascending: true })
