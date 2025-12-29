@@ -90,6 +90,8 @@ const PagesController = {
 
   // Get about page data
   getAboutPage: catchAsync(async (req, res) => {
+    const supabase = getAnonClient(); // Use anon client for reads
+
     const { data: page, error } = await supabase
       .from("pages")
       .select("*")
@@ -115,6 +117,7 @@ const PagesController = {
 
   // Get service page
   getServicePage: catchAsync(async (req, res) => {
+    const supabase = getAnonClient(); // Use anon client for reads
     const { type } = req.params;
 
     const { data: service, error } = await supabase
