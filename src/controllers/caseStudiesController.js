@@ -4,24 +4,24 @@ const { catchAsync } = require("../middleware/errorHandler");
 const CaseStudiesController = {
   // Get all case studies (public)
   getAllCaseStudies: catchAsync(async (req, res) => {
-    const { page = 1, limit = 12, sector, service_type, search } = req.query;
+    const { page = 1, limit = 12, status, service_type, search } = req.query;
 
     let query = supabase
       .from("case_studies")
       .select(
-        "id, title, slug, sector, headline_summary, featured_image_url, published_at",
+        "id, title, slug, status, headline_summary, featured_image_url, published_at",
         { count: "exact" }
       )
       .eq("is_published", true);
 
     // Apply filters
-    if (sector) query = query.eq("sector", sector);
+    if (status) query = query.eq("status", status);
     if (service_type) query = query.eq("service_type", service_type);
 
     // Search
     if (search) {
       query = query.or(
-        `title.ilike.%${search}%,sector.ilike.%${search}%,headline_summary.ilike.%${search}%`
+        `title.ilike.%${search}%,status.ilike.%${search}%,headline_summary.ilike.%${search}%`
       );
     }
 
@@ -81,24 +81,24 @@ const CaseStudiesController = {
     });
   }),
 
-  // Get case study sectors (for filters)
-  getSectors: catchAsync(async (req, res) => {
+  // Get case study statuses (for filters) - UPDATED from sectors to status
+  getStatuses: catchAsync(async (req, res) => {
     const { data, error } = await supabase
       .from("case_studies")
-      .select("sector")
+      .select("status")
       .eq("is_published", true)
-      .order("sector", { ascending: true });
+      .order("status", { ascending: true });
 
     if (error) throw error;
 
-    // Get unique sectors
-    const sectors = [...new Set(data.map((item) => item.sector))].filter(
+    // Get unique statuses
+    const statuses = [...new Set(data.map((item) => item.status))].filter(
       Boolean
     );
 
     res.json({
       success: true,
-      data: sectors,
+      data: statuses,
     });
   }),
 
@@ -108,7 +108,7 @@ const CaseStudiesController = {
 
     const { data, error } = await supabase
       .from("case_studies")
-      .select("id, title, slug, sector, headline_summary, featured_image_url")
+      .select("id, title, slug, status, headline_summary, featured_image_url")
       .eq("is_featured", true)
       .eq("is_published", true)
       .order("featured_order", { ascending: true })
