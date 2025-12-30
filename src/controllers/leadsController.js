@@ -226,7 +226,7 @@ const LeadsController = {
     const { data, error } = await supabase
       .from("job_openings")
       .select(
-        "id, role_title, business_division, team, work_type, location, description"
+        "id, role_title, business_division, team, work_type, location, description, excerpt"
       )
       .eq("is_active", true)
       .order("created_at", { ascending: false });
