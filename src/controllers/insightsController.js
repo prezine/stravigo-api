@@ -9,7 +9,7 @@ const InsightsController = {
     let query = supabase
       .from("insights")
       .select(
-        "id, title, slug, category, featured_image_url, author_name, published_at, excerpt",
+        "id, title, slug, category, featured_image_url, author_name, published_at, excerpt, is_featured",
         { count: "exact" }
       )
       .eq("is_published", true);
@@ -119,7 +119,7 @@ const InsightsController = {
     const { data, error } = await supabase
       .from("insights")
       .select(
-        "id, title, slug, category, featured_image_url, author_name, published_at, excerpt"
+        "id, title, slug, category, featured_image_url, author_name, published_at, excerpt, is_featured"
       )
       .eq("is_published", true)
       .order("published_at", { ascending: false })
