@@ -2,6 +2,28 @@ const { supabase } = require("../config/supabase");
 const { catchAsync } = require("../middleware/errorHandler");
 
 const InsightsController = {
+  // Get featured insights/articles
+  getFeaturedInsights: catchAsync(async (req, res) => {
+    const { limit = 6 } = req.query;
+
+    const { data, error } = await supabase
+      .from("insights")
+      .select(
+        "id, title, slug, category, featured_image_url, author_name, published_at, excerpt, is_featured"
+      )
+      .eq("is_published", true)
+      .eq("is_featured", true)
+      .order("published_at", { ascending: false })
+      .limit(parseInt(limit));
+
+    if (error) throw error;
+
+    res.json({
+      success: true,
+      data,
+    });
+  }),
+
   // Get all insights/articles
   getAllInsights: catchAsync(async (req, res) => {
     const { page = 1, limit = 12, category, format, search } = req.query;

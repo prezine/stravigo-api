@@ -7,5 +7,6 @@ router.get("/", insightsController.getAllInsights);
 router.get("/latest", insightsController.getLatestInsights);
 router.get("/categories", insightsController.getCategories);
 router.get("/:slug", insightsController.getInsight);
+router.get("/featured", insightsController.getFeaturedInsights);
 
 module.exports = router;
